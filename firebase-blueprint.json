@@ -1,0 +1,210 @@
+{
+  "entities": {
+    "PublicUserProfile": {
+      "title": "PublicUserProfile",
+      "description": "Publicly discoverable user profile without private PII unless phone search is opted in.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID matching document ID." },
+        "displayName": { "type": "string", "description": "Public display name." },
+        "username": { "type": "string", "description": "Unique lowercase handle." },
+        "bio": { "type": "string", "description": "Short user bio." },
+        "avatarUrl": { "type": "string", "description": "Optional public profile picture URL." },
+        "allowPhoneSearch": { "type": "boolean", "description": "Whether the user opted into discovery by phone number." },
+        "searchablePhone": { "type": "string", "description": "E.164 phone number only populated when allowPhoneSearch is true, otherwise empty." },
+        "isDiscoverable": { "type": "boolean", "description": "True when profile is discoverable in search." },
+        "isOnline": { "type": "boolean", "description": "Online presence flag." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp of creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last update." }
+      },
+      "required": ["userId", "displayName", "username", "allowPhoneSearch", "searchablePhone", "isDiscoverable", "isOnline", "createdAt", "updatedAt"]
+    },
+    "PrivateUserProfile": {
+      "title": "PrivateUserProfile",
+      "description": "Owner-only private profile containing PII and app preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID matching document ID." },
+        "email": { "type": "string", "description": "Private email address." },
+        "phoneNumber": { "type": "string", "description": "Private E.164 phone number." },
+        "countryCode": { "type": "string", "description": "Selected dialing code, default +234." },
+        "isPhoneVerified": { "type": "boolean", "description": "True only when verified via Firebase Auth phone token." },
+        "preferredLanguage": { "type": "string", "enum": ["ha", "en"], "description": "Selected UI language." },
+        "themeMode": { "type": "string", "enum": ["system", "light", "dark"], "description": "Theme preference." },
+        "notificationsEnabled": { "type": "boolean", "description": "Push notification preference." },
+        "allowPhoneSearch": { "type": "boolean", "description": "Privacy toggle for phone discovery." },
+        "readReceiptsEnabled": { "type": "boolean", "description": "Privacy toggle for read receipts." },
+        "fcmToken": { "type": "string", "description": "Optional FCM registration token." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp of creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last update." }
+      },
+      "required": ["userId", "countryCode", "isPhoneVerified", "preferredLanguage", "themeMode", "notificationsEnabled", "allowPhoneSearch", "readReceiptsEnabled", "createdAt", "updatedAt"]
+    },
+    "BlockedUser": {
+      "title": "BlockedUser",
+      "description": "Owner-only record of a blocked user.",
+      "type": "object",
+      "properties": {
+        "blockedUserId": { "type": "string", "description": "UID of blocked user." },
+        "displayName": { "type": "string", "description": "Cached display name." },
+        "username": { "type": "string", "description": "Cached username." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp." }
+      },
+      "required": ["blockedUserId", "createdAt"]
+    },
+    "FriendRequest": {
+      "title": "FriendRequest",
+      "description": "Friend request between two authenticated users.",
+      "type": "object",
+      "properties": {
+        "fromUserId": { "type": "string" },
+        "toUserId": { "type": "string" },
+        "fromDisplayName": { "type": "string" },
+        "fromUsername": { "type": "string" },
+        "toDisplayName": { "type": "string" },
+        "toUsername": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fromUserId", "toUserId", "fromDisplayName", "fromUsername", "toDisplayName", "toUsername", "status", "createdAt", "updatedAt"]
+    },
+    "UserReport": {
+      "title": "UserReport",
+      "description": "Immutable abuse report submitted by a user.",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string" },
+        "reportedUserId": { "type": "string" },
+        "reason": { "type": "string" },
+        "details": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reporterId", "reportedUserId", "reason", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "One-to-one chat metadata document.",
+      "type": "object",
+      "properties": {
+        "participantIds": { "type": "array" },
+        "participantNames": { "type": "object" },
+        "participantAvatars": { "type": "object" },
+        "lastMessageText": { "type": "string" },
+        "lastMessageType": { "type": "string", "enum": ["text", "image", "document", "voice"] },
+        "lastMessageSenderId": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "unreadCounts": { "type": "object" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantIds", "participantNames", "lastMessageText", "lastMessageType", "unreadCounts", "createdBy", "createdAt", "updatedAt"]
+    },
+    "DirectMessage": {
+      "title": "DirectMessage",
+      "description": "Individual message inside a one-to-one conversation.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "participantIds": { "type": "array" },
+        "text": { "type": "string" },
+        "messageType": { "type": "string", "enum": ["text", "image", "document", "voice"] },
+        "mediaUrl": { "type": "string" },
+        "mediaName": { "type": "string" },
+        "voiceDurationMs": { "type": "integer" },
+        "replyToMessageId": { "type": "string" },
+        "replyToPreview": { "type": "string" },
+        "status": { "type": "string", "enum": ["sent", "delivered", "read"] },
+        "reactions": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["conversationId", "senderId", "senderName", "participantIds", "text", "messageType", "status", "createdAt", "updatedAt"]
+    },
+    "ChatGroup": {
+      "title": "ChatGroup",
+      "description": "Group chat metadata, administrators, and permissions.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "adminIds": { "type": "array" },
+        "memberIds": { "type": "array" },
+        "memberNames": { "type": "object" },
+        "onlyAdminsCanPost": { "type": "boolean" },
+        "onlyAdminsCanAddMembers": { "type": "boolean" },
+        "lastMessageText": { "type": "string" },
+        "lastMessageSenderName": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "ownerId", "adminIds", "memberIds", "memberNames", "onlyAdminsCanPost", "onlyAdminsCanAddMembers", "createdAt", "updatedAt"]
+    },
+    "GroupMessage": {
+      "title": "GroupMessage",
+      "description": "Message inside a group chat.",
+      "type": "object",
+      "properties": {
+        "groupId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "memberIds": { "type": "array" },
+        "text": { "type": "string" },
+        "messageType": { "type": "string", "enum": ["text", "image", "document", "voice"] },
+        "mediaUrl": { "type": "string" },
+        "mediaName": { "type": "string" },
+        "voiceDurationMs": { "type": "integer" },
+        "replyToMessageId": { "type": "string" },
+        "replyToPreview": { "type": "string" },
+        "reactions": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["groupId", "senderId", "senderName", "memberIds", "text", "messageType", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/user_public/{userId}": {
+      "schema": { "$ref": "#/entities/PublicUserProfile" },
+      "description": "Publicly searchable user directory with opt-in phone search."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/PrivateUserProfile" },
+      "description": "Owner-only private profile, PII, and preferences."
+    },
+    "/users/{userId}/blocked/{blockedUserId}": {
+      "schema": { "$ref": "#/entities/BlockedUser" },
+      "description": "Owner-only blocked users subcollection."
+    },
+    "/friend_requests/{requestId}": {
+      "schema": { "$ref": "#/entities/FriendRequest" },
+      "description": "Friend requests scoped to sender and recipient."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/UserReport" },
+      "description": "Immutable abuse reports scoped to reporter."
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "1-to-1 conversations scoped to participants."
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/DirectMessage" },
+      "description": "Messages inside a 1-to-1 conversation."
+    },
+    "/groups/{groupId}": {
+      "schema": { "$ref": "#/entities/ChatGroup" },
+      "description": "Group conversations with admins and member permissions."
+    },
+    "/groups/{groupId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/GroupMessage" },
+      "description": "Messages inside a group chat."
+    }
+  }
+}

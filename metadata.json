@@ -1,0 +1,6 @@
+{
+  "name": "Lukuman Free Chat",
+  "description": "Connect the World. Chat Without Limits. Native Android messaging app by Lukuman Muhammad Abubakar Fagge with Hausa and English support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

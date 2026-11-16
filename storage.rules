@@ -1,0 +1,40 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidMediaSize() {
+      return request.resource.size <= 15 * 1024 * 1024;
+    }
+
+    // Owner-only profile avatars
+    match /avatars/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId &&
+                      isValidMediaSize() &&
+                      request.resource.contentType.matches('image/.*');
+      allow delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Group avatars (authenticated group members upload)
+    match /group_avatars/{groupId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isValidMediaSize() &&
+                      request.resource.contentType.matches('image/.*');
+    }
+
+    // Direct chat attachments (images, documents, voice messages)
+    match /chat_media/{conversationId}/{senderId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == senderId && isValidMediaSize();
+    }
+
+    // Group chat attachments
+    match /group_media/{groupId}/{senderId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == senderId && isValidMediaSize();
+    }
+  }
+}
